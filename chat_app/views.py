@@ -27,7 +27,13 @@ def send_message(request):
                 sender=request.user,
                 content=content
             )
-        return redirect("chat-list")   # or "chat-list" — use the name you defined
+        return redirect("chat-list")   
+    
 
-    # If someone tries GET → just redirect
-    return redirect("chat-list")
+    messages = Message.objects.all().order_by("timestamp")
+    return render(
+        request,
+        "chat_list.html", 
+        {"chats": messages})
+
+    
