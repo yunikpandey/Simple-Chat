@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="messages" id="chat-messages">
+
+  
+  <!-- This spacer pushes all real messages to the bottom -->
+  <div style="flex: 1 1 auto; min-height: 0;"></div>
+
+
+  {% for message in chats %}
+    <div class="message-wrapper {% if message.sender == user %}sent{% else %}received{% endif %}">
+
+      <div class="avatar">
+        <img src="https://ui-avatars.com/api/?name={{ message.sender.username }}&background=random&color=fff&size=128"
+             alt="{{ message.sender.username }}" />
+      </div>
+
+      <div class="message-bubble">
+        <div class="message-content">
+          <!-- Optional: show username only for received messages -->
+          {% if message.sender != user %}
+            <strong class="sender-name">{{ message.sender.username }}</strong>
+          {% endif %}
+
+          <div>{{ message.content|linebreaksbr }}</div>
+        </div>
+
+        <div class="message-time">
+          {{ message.timestamp|date:"H:i" }}
+        </div>
+      </div>
+
+    </div>
+  {% empty %}
+    <div class="no-messages">
+      <p>No messages yet.</p>
+      <small>Start the conversation!</small>
+    </div>
+  {% endfor %}
+</div>
+
+{% if user.is_authenticated %}
+  <!-- Input area - only shown to logged-in users -->
+  <div class="input-area p-3 border-top bg-white">
+    <form action="{% url 'send-message' %}" method="post" class="d-flex gap-2 align-items-end">
+      {% csrf_token %}
+      <input 
+        type="text" 
+        name="content" 
+        class="form-control" 
+        placeholder="Type a message..." 
+        autocomplete="off"
+        required
+        autofocus
+      />
+      <button type="submit" class="btn btn-success px-4">
+        Send
+      </button>
+    </form>
+  </div>
+{% else %}
+  <div class="text-center py-4 text-muted">
+    <p>Please <a href="{% url 'login' %}">log in</a> to send messages.</p>
+  </div>
+{% endif %}
+
+{% endblock content %}
